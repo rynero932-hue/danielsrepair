@@ -1,0 +1,24 @@
+{
+  "name": "Daniel's Repair Center",
+  "short_name": "Daniel's RC",
+  "description": "iPhone Specialist Wonogiri — Booking service online",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+
+  ]
+}
