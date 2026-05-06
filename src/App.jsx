@@ -605,7 +605,7 @@ function PageHome({ setPage }) {
 }
 
 // ─── PAGE BOOKING ─────────────────────────────────────────────────────────────
-function PageBooking({ setQueue, addToast }) {
+function PageBooking({ setQueue, addToast, setMyBookings }) {
   const [step,setStep]=useState(0);
   const [name,setName]=useState("");
   const [phone,setPhone]=useState("");
@@ -644,6 +644,7 @@ function PageBooking({ setQueue, addToast }) {
       });
       
       setResult({id,name:name.trim(),model,svc:svc.label,price:svc.price,date,time});
+      setMyBookings(prev => [...new Set([...prev, id])]);
       setStep(2);
       addToast("success","Booking Berhasil! 🎉",`ID: ${id} · Hadir 5 mnt sebelum jadwal`);
     } catch (error) {
@@ -1024,21 +1025,31 @@ function PageMaps({ dark }) {
   );
 }
 
-// ─── PAGE PROFILE ─────────────────────────────────────────────────────────────
-function PageProfile({ dark, toggleDark, queue }) {
+// ─── PAGE PROFILE (MENU & HELP) ──────────────────────────────────────────────
+function PageProfile({ setPage, dark, toggleDark, queue, myBookings, addToast }) {
+  const myData = queue.filter(q => myBookings.includes(q.id));
+  
+  const menuItems = [
+    { I: Search, l: "Lacak Booking", s: "Cek status perbaikan kamu", action: () => setPage("track") },
+    { I: Tag,    l: "Daftar Harga",  s: "Estimasi biaya perbaikan", action: () => setPage("pricelist") },
+    { I: MapPin, l: "Lokasi Toko",   s: "Alamat & penunjuk arah",   action: () => setPage("maps") },
+    { I: MessageCircle, l: "WhatsApp CS", s: "Konsultasi teknisi langsung", action: () => window.open("https://wa.me/6281234567890", "_blank") },
+    { I: Info,   l: "Tentang DRC",   s: "Versi 1.0.2 (Production)", action: () => addToast("info", "Daniel's Repair Center", "Spesialis iPhone Terpercaya di Wonogiri.") },
+  ];
+
   return (
     <div className="gap-4">
       <div className="card-gold card-p" style={{textAlign:"center",padding:20}}>
         <div style={{width:60,height:60,borderRadius:"50%",background:"var(--gold-dim)",border:"2px solid var(--gold-border)",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 12px"}}>
           <User size={26} style={{color:"var(--gold)"}}/>
         </div>
-        <div style={{fontSize:17,fontWeight:800,color:"var(--text)",marginBottom:4}}>Pelanggan Daniel's</div>
-        <div style={{fontSize:12,color:"var(--text2)",marginBottom:12}}>Member sejak 2024</div>
+        <div style={{fontSize:17,fontWeight:800,color:"var(--text)",marginBottom:4}}>Halo, Pelanggan!</div>
+        <div style={{fontSize:12,color:"var(--text2)",marginBottom:12}}>Pusat Layanan Daniel's Repair Center</div>
         <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"var(--gold-dim)",border:"1px solid var(--gold-border)",borderRadius:100,padding:"5px 14px",fontSize:11,fontWeight:700,color:"var(--gold)"}}>
-          <Star size={10} style={{fill:"var(--gold)"}}/> Gold Member
+          <Shield size={10} style={{fill:"var(--gold)"}}/> Guest Account
         </div>
         <div style={{borderTop:"1px solid var(--border)",marginTop:14,paddingTop:14}} className="profile-stats">
-          {[["Booking",queue.length],["Selesai",queue.filter(q=>q.status==="Selesai").length],["Poin","120"]].map(([l,v])=>(
+          {[["Booking Saya", myData.length],["Selesai", myData.filter(q=>q.status==="Selesai").length],["Garansi","30 Hari"]].map(([l,v])=>(
             <div key={l} className="profile-stat">
               <div style={{fontSize:20,fontWeight:800,color:"var(--text)"}}>{v}</div>
               <div style={{fontSize:10,color:"var(--text3)",marginTop:2}}>{l}</div>
@@ -1048,26 +1059,26 @@ function PageProfile({ dark, toggleDark, queue }) {
       </div>
 
       {/* Dark/Light toggle */}
-      <div className="card card-p-sm" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+      <div className="card card-p-sm" style={{display:"flex",alignItems:"center",justifyContent:"space-between"}} onClick={toggleDark}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <IcoBox icon={dark?Moon:Sun} size={16} dim="36px"/>
           <div>
-            <div style={{fontSize:14,fontWeight:600,color:"var(--text)"}}>Tampilan</div>
-            <div style={{fontSize:11,color:"var(--text2)"}}>{dark?"Mode Gelap Aktif":"Mode Terang Aktif"}</div>
+            <div style={{fontSize:14,fontWeight:600,color:"var(--text)"}}>Mode Tampilan</div>
+            <div style={{fontSize:11,color:"var(--text2)"}}>{dark?"Gunakan Mode Terang":"Gunakan Mode Gelap"}</div>
           </div>
         </div>
-        <button className={`switch ${dark?"switch-on":"switch-off"}`} onClick={toggleDark}>
+        <button className={`switch ${dark?"switch-on":"switch-off"}`} onClick={e => { e.stopPropagation(); toggleDark(); }}>
           <div className={`switch-knob ${dark?"switch-knob-on":"switch-knob-off"}`}/>
         </button>
       </div>
 
       {/* Recent bookings */}
-      {queue.length>0&&(
+      {myData.length>0&&(
         <div>
-          <div style={{fontSize:14,fontWeight:700,color:"var(--text)",marginBottom:9}}>Riwayat Booking Terbaru</div>
+          <div style={{fontSize:14,fontWeight:700,color:"var(--text)",marginBottom:9}}>Riwayat Booking Saya</div>
           <div style={{display:"flex",flexDirection:"column",gap:7}}>
-            {queue.slice(-3).reverse().map(b=>(
-              <div key={b.id} className="card card-p-sm" style={{display:"flex",alignItems:"center",gap:11}}>
+            {myData.slice(0,3).map(b=>(
+              <div key={b.id} className="card card-p-sm" style={{display:"flex",alignItems:"center",gap:11, cursor: "pointer"}} onClick={() => { setPage("track"); }}>
                 <IcoBox icon={Smartphone} size={15} dim="36px"/>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:12,fontWeight:600,color:"var(--text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{b.model}</div>
@@ -1084,15 +1095,15 @@ function PageProfile({ dark, toggleDark, queue }) {
       )}
 
       <div className="menu-list">
-        {[{I:Bell,l:"Notifikasi",s:"Status perbaikanmu"},{I:Shield,l:"Garansi Saya",s:"Riwayat garansi aktif"},{I:MessageCircle,l:"Hubungi Kami",s:"WhatsApp · Telepon"},{I:Info,l:"Tentang Aplikasi",s:"Versi 1.0.0"}].map(({I,l,s})=>(
-          <div key={l} className="menu-item">
+        {menuItems.map(({I,l,s, action})=>(
+          <div key={l} className="menu-item" onClick={action}>
             <div className="menu-ico"><I size={15}/></div>
             <div><div className="menu-title">{l}</div><div className="menu-sub">{s}</div></div>
             <div className="menu-chev"><ChevronRight size={14}/></div>
           </div>
         ))}
       </div>
-      <div style={{textAlign:"center",fontSize:11,color:"var(--text3)",paddingBottom:8}}>Daniel's Repair Center · iPhone Specialist · Wonogiri<br/>v1.0.0</div>
+      <div style={{textAlign:"center",fontSize:11,color:"var(--text3)",paddingBottom:8}}>Daniel's Repair Center · iPhone Specialist · Wonogiri<br/>v1.0.2</div>
     </div>
   );
 }
@@ -1213,10 +1224,8 @@ function PageAdmin({ queue, setQueue, addToast }) {
 const NAV=[
   {id:"home",   label:"Home",   icon:Home},
   {id:"booking",label:"Booking",icon:Calendar},
-  {id:"pricelist",label:"Harga",icon:Tag},
   {id:"track",  label:"Lacak",  icon:Search},
-  {id:"maps",   label:"Lokasi", icon:MapPin},
-  {id:"profile",label:"Profil", icon:User},
+  {id:"profile",label:"Menu",   icon:User},
 ];
 
 // ─── ROOT ─────────────────────────────────────────────────────────────────────
@@ -1236,6 +1245,17 @@ export default function App() {
     });
     return ()=>unsub();
   },[]);
+
+  // Local storage for personal bookings
+  const [myBookings, setMyBookings] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("drc_user_bookings") || "[]");
+    } catch (e) { return []; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem("drc_user_bookings", JSON.stringify(myBookings));
+  }, [myBookings]);
 
   const [toasts,setToasts]=useState([]);
   const toastRef=useRef(0);
@@ -1311,11 +1331,11 @@ export default function App() {
           ) : (
             <>
               {page==="home"      &&<PageHome      setPage={setPage}/>}
-              {page==="booking"   &&<PageBooking   setQueue={setQueue} addToast={addToast}/>}
+              {page==="booking"   &&<PageBooking   setQueue={setQueue} addToast={addToast} setMyBookings={setMyBookings}/>}
               {page==="pricelist" &&<PagePricelist/>}
               {page==="track"     &&<PageTrack     queue={queue} addToast={addToast}/>}
               {page==="maps"      &&<PageMaps      dark={dark}/>}
-              {page==="profile"   &&<PageProfile   dark={dark} toggleDark={()=>setDark(d=>!d)} queue={queue}/>}
+              {page==="profile"   &&<PageProfile   setPage={setPage} dark={dark} toggleDark={()=>setDark(d=>!d)} queue={queue} myBookings={myBookings} addToast={addToast}/>}
               {page==="admin"     &&<PageAdmin     queue={queue} setQueue={setQueue} addToast={addToast}/>}
             </>
           )}
