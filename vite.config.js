@@ -1,12 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true, // expose ke network (berguna di Replit)
+    host: true,
   },
   build: {
     outDir: 'dist',
@@ -15,6 +14,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['react', 'react-dom'],
+          firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/analytics'],
           icons: ['lucide-react'],
         }
       }

@@ -1,0 +1,9 @@
+TARUH FILE logo.png DI FOLDER INI
+
+File logo.png dipakai untuk:
+- Ikon di app bar
+- PWA icon 512x512 (manifest.json)
+
+Rekomendasi ukuran: 512x512 px, format PNG dengan background transparan atau hitam (#0a0a0f).
+
+Buat dari: https://favicon.io atau tools desain lainnya.

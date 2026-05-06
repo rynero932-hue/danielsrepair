@@ -1,0 +1,26 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /bookings/{bookingId} {
+
+      // ✅ Customer bisa CREATE booking tanpa login
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'id', 'name', 'phone', 'model', 'svc', 'price',
+          'date', 'time', 'status', 'createdAt'
+        ])
+        && request.resource.data.status == 'Menunggu'
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() > 0;
+
+      // ✅ Siapa saja bisa READ (untuk fitur track order)
+      allow read: if true;
+
+      // ✅ Hanya admin (Firebase Auth) yang bisa UPDATE & DELETE
+      allow update, delete: if request.auth != null;
+    }
+  }
+}
