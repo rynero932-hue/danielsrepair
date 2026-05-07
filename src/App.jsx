@@ -44,8 +44,8 @@ import {
 // ─── KONTAK & INFO TOKO — GANTI SESUAI DATA ASLI ──────────────────────────────
 // ⚠️  Ganti semua nilai di bawah ini dengan data Daniel yang sebenarnya
 const SHOP = {
-  phone:     "6281234567890",          // nomor WA tanpa + (contoh: 6281234567890)
-  phoneDisplay: "+62 812-3456-7890",   // tampilan di UI
+  phone:     "6281286467275",          // nomor WA tanpa + (contoh: 6281286467275)
+  phoneDisplay: "+62 812-8646-7275",   // tampilan di UI
   instagram: "@danielsrepairwonogiri",
   address:   "Jl. Raya Wonogiri No. 88\nWonogiri, Jawa Tengah 57611",
   hours:     "Senin – Sabtu: 09.00 – 17.00 WIB\nMinggu: 09.00 – 14.00 WIB",
@@ -1243,6 +1243,35 @@ export default function App() {
 
   const isReady = authReady && !loading;
 
+  // ── Tap logo 7x → buka halaman Admin ──────────────────────────────────────
+  const tapCount  = useRef(0);
+  const tapTimer  = useRef(null);
+  const [tapHint, setTapHint] = useState(0); // sisa ketukan
+
+  const handleLogoTap = () => {
+    tapCount.current += 1;
+    const remaining = 7 - tapCount.current;
+
+    // Tampilkan hint setelah 2 ketukan
+    if (tapCount.current >= 2 && remaining > 0) setTapHint(remaining);
+
+    // Reset timer setiap ketukan
+    clearTimeout(tapTimer.current);
+    tapTimer.current = setTimeout(() => {
+      tapCount.current = 0;
+      setTapHint(0);
+    }, 2000);
+
+    // Sudah 7x → masuk admin
+    if (tapCount.current >= 7) {
+      tapCount.current = 0;
+      setTapHint(0);
+      clearTimeout(tapTimer.current);
+      setPage("admin");
+      addToast("info", "Mode Admin", adminUser ? "Selamat datang kembali!" : "Silakan login untuk melanjutkan");
+    }
+  };
+
   return (
     <>
       <style>{GLOBAL_CSS}</style>
@@ -1252,13 +1281,25 @@ export default function App() {
         {/* TOPBAR */}
         <div className="topbar">
           <div className="topbar-inner">
-            <div className="logo-wrap">
-              <div className="logo-box">
+            {/* Logo — tap 7x untuk akses admin */}
+            <div className="logo-wrap" onClick={handleLogoTap} style={{ cursor:"default", userSelect:"none" }}>
+              <div className="logo-box" style={{ position:"relative" }}>
                 <img src="/logo.png" alt="Logo" style={{ width:22, height:22, objectFit:"contain", borderRadius:4 }}
                   onError={e => { e.target.style.display="none"; e.target.nextSibling.style.display="flex"; }}/>
                 <div style={{ display:"none", alignItems:"center", justifyContent:"center" }}>
                   <Wrench size={18} style={{ color:"var(--gold)" }}/>
                 </div>
+                {/* Hint badge ketukan */}
+                {tapHint > 0 && (
+                  <div style={{
+                    position:"absolute", top:-6, right:-6,
+                    width:16, height:16, borderRadius:"50%",
+                    background:"var(--gold)", color:"#000",
+                    fontSize:9, fontWeight:800,
+                    display:"flex", alignItems:"center", justifyContent:"center",
+                    boxShadow:"0 1px 4px rgba(0,0,0,.3)"
+                  }}>{tapHint}</div>
+                )}
               </div>
               <div>
                 <div className="logo-name">Daniel's</div>
