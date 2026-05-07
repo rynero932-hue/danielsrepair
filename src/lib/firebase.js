@@ -3,13 +3,6 @@ import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-// ✅ Semua key diambil dari environment variables — JANGAN hardcode di sini
-// Buat file .env di root project dengan isi:
-//   VITE_FIREBASE_API_KEY=...
-//   VITE_FIREBASE_AUTH_DOMAIN=...
-//   dst.
-// Di Vercel: Settings → Environment Variables → tambahkan satu per satu
-
 const firebaseConfig = {
   apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -20,9 +13,10 @@ const firebaseConfig = {
   measurementId:     import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app      = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
-const db       = getFirestore(app);
-const auth     = getAuth(app);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
 export { app, analytics, db, auth };

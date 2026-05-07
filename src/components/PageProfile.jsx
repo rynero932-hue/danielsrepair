@@ -4,6 +4,7 @@ import {
   Instagram, MessageCircle, Clock, ChevronRight,
   LogOut, Settings, ShieldCheck
 } from "lucide-react";
+import { onAuthStateChanged } from "firebase/auth";
 import { Badge } from "./UI";
 import { fmtDate } from "../lib/constants";
 import { auth, db } from "../lib/firebase";
@@ -17,7 +18,7 @@ export function PageProfile({ setPage, dark, toggleDark, addToast }) {
   const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => setUser(u));
+    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
     if (phoneNumber) fetchBookings(phoneNumber);
     return () => unsub();
   }, []);
@@ -53,7 +54,7 @@ export function PageProfile({ setPage, dark, toggleDark, addToast }) {
   return (
     <div className="gap-4">
       <div style={{ textAlign: "center", padding: "10px 0" }}>
-        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--bg3)", border: "1px solid var(--border2)", display: "flex", alignItems: "center", justifyCenter: "center", margin: "0 auto 12px", color: "var(--gold)" }}>
+        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--bg3)", border: "1px solid var(--border2)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", color: "var(--gold)" }}>
           <User size={32} />
         </div>
         <h1 className="page-title">{phoneNumber || "Pelanggan Setia"}</h1>

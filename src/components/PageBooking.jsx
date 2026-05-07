@@ -56,7 +56,11 @@ export function PageBooking({ addToast, setPage }) {
     setLoading(true);
     try {
       // Professional ID: DRC- + 6 char random hex
-      const shortId = "DRC-" + crypto.randomUUID().split("-")[0].substring(0, 6).toUpperCase();
+      const randomPart = window.crypto?.randomUUID 
+        ? crypto.randomUUID().split("-")[0].substring(0, 6).toUpperCase()
+        : Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      const shortId = "DRC-" + randomPart;
       
       const bookingData = {
         id: shortId,
